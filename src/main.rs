@@ -1,0 +1,27 @@
+fn main() {
+    aoc::day01::day1();
+    aoc::day02::day2();
+    aoc::day03::day3();
+    aoc::day04::day4();
+    aoc::day05::day5();
+    aoc::day06::day6();
+    aoc::day07::day7();
+    aoc::day08::day8();
+    aoc::day09::day9();
+    aoc::day10::day10();
+    aoc::day11::day11();
+    aoc::day12::day12();
+    aoc::day13::day13();
+    aoc::day14::day14();
+    aoc::day15::day15();
+    aoc::day16::day16();
+    aoc::day17::day17();
+    aoc::day18::day18();
+    aoc::day19::day19();
+    aoc::day20::day20();
+    aoc::day21::day21();
+    aoc::day22::day22();
+    aoc::day23::day23();
+    aoc::day24::day24();
+    aoc::day25::day25();
+}

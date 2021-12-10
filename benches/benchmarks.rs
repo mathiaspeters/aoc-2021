@@ -1,0 +1,58 @@
+use aoc::*;
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+fn criterion_benchmark(c: &mut Criterion) {
+    c.bench_function("Day 1-1", |b| b.iter(|| black_box(day01::part1())));
+    c.bench_function("Day 1-2", |b| b.iter(|| black_box(day01::part2())));
+    c.bench_function("Day 2-1", |b| b.iter(|| black_box(day02::part1())));
+    c.bench_function("Day 2-2", |b| b.iter(|| black_box(day02::part2())));
+    c.bench_function("Day 3-1", |b| b.iter(|| black_box(day03::part1())));
+    c.bench_function("Day 3-2", |b| b.iter(|| black_box(day03::part2())));
+    c.bench_function("Day 4-1", |b| b.iter(|| black_box(day04::part1())));
+    c.bench_function("Day 4-2", |b| b.iter(|| black_box(day04::part2())));
+    c.bench_function("Day 5-1", |b| b.iter(|| black_box(day05::part1())));
+    c.bench_function("Day 5-2", |b| b.iter(|| black_box(day05::part2())));
+    c.bench_function("Day 6-1", |b| b.iter(|| black_box(day06::part1())));
+    c.bench_function("Day 6-2", |b| b.iter(|| black_box(day06::part2())));
+    c.bench_function("Day 7-1", |b| b.iter(|| black_box(day07::part1())));
+    c.bench_function("Day 7-2", |b| b.iter(|| black_box(day07::part2())));
+    c.bench_function("Day 8-1", |b| b.iter(|| black_box(day08::part1())));
+    c.bench_function("Day 8-2", |b| b.iter(|| black_box(day08::part2())));
+    c.bench_function("Day 9-1", |b| b.iter(|| black_box(day09::part1())));
+    c.bench_function("Day 9-2", |b| b.iter(|| black_box(day09::part2())));
+    c.bench_function("Day 10-1", |b| b.iter(|| black_box(day10::part1())));
+    c.bench_function("Day 10-2", |b| b.iter(|| black_box(day10::part2())));
+    c.bench_function("Day 11-1", |b| b.iter(|| black_box(day11::part1())));
+    c.bench_function("Day 11-2", |b| b.iter(|| black_box(day11::part2())));
+    c.bench_function("Day 12-1", |b| b.iter(|| black_box(day12::part1())));
+    c.bench_function("Day 12-2", |b| b.iter(|| black_box(day12::part2())));
+    c.bench_function("Day 13-1", |b| b.iter(|| black_box(day13::part1())));
+    c.bench_function("Day 13-2", |b| b.iter(|| black_box(day13::part2())));
+    c.bench_function("Day 14-1", |b| b.iter(|| black_box(day14::part1())));
+    c.bench_function("Day 14-2", |b| b.iter(|| black_box(day14::part2())));
+    c.bench_function("Day 15-1", |b| b.iter(|| black_box(day15::part1())));
+    c.bench_function("Day 15-2", |b| b.iter(|| black_box(day15::part2())));
+    c.bench_function("Day 16-1", |b| b.iter(|| black_box(day16::part1())));
+    c.bench_function("Day 16-2", |b| b.iter(|| black_box(day16::part2())));
+    c.bench_function("Day 17-1", |b| b.iter(|| black_box(day17::part1())));
+    c.bench_function("Day 17-2", |b| b.iter(|| black_box(day17::part2())));
+    c.bench_function("Day 18-1", |b| b.iter(|| black_box(day18::part1())));
+    c.bench_function("Day 18-2", |b| b.iter(|| black_box(day18::part2())));
+    c.bench_function("Day 19-1", |b| b.iter(|| black_box(day19::part1())));
+    c.bench_function("Day 19-2", |b| b.iter(|| black_box(day19::part2())));
+    c.bench_function("Day 20-1", |b| b.iter(|| black_box(day20::part1())));
+    c.bench_function("Day 20-2", |b| b.iter(|| black_box(day20::part2())));
+    c.bench_function("Day 21-1", |b| b.iter(|| black_box(day21::part1())));
+    c.bench_function("Day 21-2", |b| b.iter(|| black_box(day21::part2())));
+    c.bench_function("Day 22-1", |b| b.iter(|| black_box(day22::part1())));
+    c.bench_function("Day 22-2", |b| b.iter(|| black_box(day22::part2())));
+    c.bench_function("Day 23-1", |b| b.iter(|| black_box(day23::part1())));
+    c.bench_function("Day 23-2", |b| b.iter(|| black_box(day23::part2())));
+    c.bench_function("Day 24-1", |b| b.iter(|| black_box(day24::part1())));
+    c.bench_function("Day 24-2", |b| b.iter(|| black_box(day24::part2())));
+    c.bench_function("Day 25-1", |b| b.iter(|| black_box(day25::part1())));
+    c.bench_function("Day 25-2", |b| b.iter(|| black_box(day25::part2())));
+}
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);
