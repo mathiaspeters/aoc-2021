@@ -11,29 +11,19 @@ pub fn part2() -> usize {
     process(256)
 }
 fn process(days: usize) -> usize {
-    let mut population = [0_usize; 9];
-    input().iter().for_each(|f| population[*f] += 1);
-    for _ in 0..days {
-        let mut new_population = [0_usize; 9];
-        for i in 1..9 {
-            new_population[i - 1] = population[i]
-        }
-        new_population[6] += population[0];
-        new_population[8] += population[0];
-        population = new_population;
-    }
-    let mut result = 0;
-    for p in population {
-        result += p;
-    }
-    result as usize
-}
-
-fn input() -> Vec<usize> {
-    raw_input()
-        .split(',')
-        .map(|s| s.parse::<usize>().unwrap())
-        .collect::<Vec<_>>()
+    let mut population = [0_u32; 9];
+    raw_input().chars().filter(|c| *c != ',').for_each(|c| {
+        population[super::util::char_to_u8(c).unwrap() as usize] += 1;
+    });
+    (0..days).for_each(|_| {
+        let reproducing = population[0];
+        population[7] += population[0];
+        (1..9).for_each(|i| population[i - 1] = population[i]);
+        population[8] = reproducing;
+    });
+    population
+        .into_iter()
+        .fold(0_usize, |acc, val| acc + val as usize)
 }
 
 #[cfg(not(test))]
