@@ -53,18 +53,10 @@ fn build_map() -> Vec<Vec<u8>> {
     let mut map: Vec<Vec<u8>> = vec![];
     raw_input().split('\n').for_each(|line| {
         let mut row = vec![];
-        line.chars().for_each(|c| match c {
-            '0' => row.push(0),
-            '1' => row.push(1),
-            '2' => row.push(2),
-            '3' => row.push(3),
-            '4' => row.push(4),
-            '5' => row.push(5),
-            '6' => row.push(6),
-            '7' => row.push(7),
-            '8' => row.push(8),
-            '9' => row.push(9),
-            _ => {}
+        line.chars().for_each(|c| {
+            if let Some(value) = super::util::char_to_u8(c) {
+                row.push(value);
+            }
         });
         map.push(row);
     });
