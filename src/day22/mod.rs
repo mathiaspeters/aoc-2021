@@ -4,11 +4,11 @@ pub fn day22() {
 }
 
 pub fn part1() -> usize {
-    0
+    raw_input().len()
 }
 
 pub fn part2() -> usize {
-    0
+    raw_input().len()
 }
 
 #[cfg(not(test))]

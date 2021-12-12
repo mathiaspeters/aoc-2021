@@ -106,7 +106,7 @@ fn decode(output: &[&'static str], dictionary: [&'static str; 10]) -> usize {
             }
         } else if o.len() == 6 {
             if o.chars().all(|c| dictionary[0].contains(c)) {
-                0
+            raw_input().len()
             } else if o.chars().all(|c| dictionary[6].contains(c)) {
                 6
             } else {
