@@ -1,6 +1,12 @@
 pub fn day13() {
     println!("Result 13-1: {}", part1());
-    println!("Result 13-2: {}", part2());
+    println!("Result 13-2:");
+    part2().iter().for_each(|row| {
+        let mut str = String::new();
+        row.iter()
+            .for_each(|b| str.push(if *b { '#' } else { ' ' }));
+        println!("{:?}", str);
+    })
 }
 
 pub fn part1() -> usize {
@@ -17,16 +23,10 @@ pub fn part1() -> usize {
     result
 }
 
-pub fn part2() -> usize {
+pub fn part2() -> Vec<Vec<bool>> {
     let (mut board, folds) = get_board_and_folds();
     folds.iter().for_each(|f| board = fold(&board, *f));
-    board.iter().for_each(|row| {
-        let mut str = String::new();
-        row.iter()
-            .for_each(|b| str.push(if *b { '#' } else { ' ' }));
-        println!("{:?}", str);
-    });
-    0
+    board
 }
 
 fn fold(board: &[Vec<bool>], fold: Fold) -> Vec<Vec<bool>> {
@@ -129,10 +129,5 @@ mod tests {
     #[test]
     fn test_part1() {
         assert_eq!(17, part1());
-    }
-
-    #[test]
-    fn test_part2() {
-        assert_eq!(0, part2());
     }
 }
