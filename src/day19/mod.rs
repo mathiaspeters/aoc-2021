@@ -4,75 +4,107 @@ pub fn day19() {
 }
 
 pub fn part1() -> usize {
+    process(Part::One)
+}
+
+pub fn part2() -> usize {
+    process(Part::Two)
+}
+
+enum Part {
+    One,
+    Two,
+}
+
+fn process(part: Part) -> usize {
     let mut scanners = input();
+    let mut scanner_positions = vec![(0_i16, 0_i16, 0_i16); scanners.len()];
     let common = get_common(&scanners);
-    common.iter().for_each(|((i, j), c)| {
-        println!("\nCommon {}-{}", i, j);
-        c.iter().for_each(|(a, b)| println!("{},{}", a, b));
-    });
     common.iter().for_each(|((i, j), c)| {
         let i = *i;
         let j = *j;
-        println!("\nFinding common beacons for: {}, {}", i, j);
         let mut s2 = scanners[j].clone();
-        println!("\nScanner {}", i);
-        for index in 0..scanners[i].readings[0].len() {
-            println!(
-                "{},{},{}",
-                scanners[i].readings[0][index],
-                scanners[i].readings[1][index],
-                scanners[i].readings[2][index]
-            );
-        }
-        println!("\nScanner {}", j);
-        for index in 0..scanners[0].readings[0].len() {
-            println!(
-                "{},{},{}",
-                s2.readings[0][index], s2.readings[1][index], s2.readings[2][index]
-            );
-        }
-        calculate_offset(&scanners[i], &mut s2, &c);
+        let offsets = get_scanner_position(&scanners[i], &s2, &c);
+        offset_scanner(&mut s2, offsets);
         std::mem::swap(&mut scanners[j], &mut s2);
+        scanner_positions[j] = (offsets[0].2, offsets[1].2, offsets[2].2);
     });
+    match part {
+        Part::One => count_beacons(&scanners),
+        Part::Two => get_biggest_scanner_distance(&scanner_positions),
+    }
+}
+
+fn count_beacons(scanners: &[Scanner]) -> usize {
     let mut beacons: Vec<(i16, i16, i16)> = vec![];
     scanners.iter().for_each(|s| {
         for i in 0..s.readings[0].len() {
             let b = (s.readings[0][i], s.readings[1][i], s.readings[2][i]);
-            if !beacons.contains(&b) {
-                beacons.push(b);
-            }
+            beacons.push(b);
         }
     });
     beacons.sort_unstable();
+    beacons.dedup();
     beacons.len()
 }
 
-pub fn part2() -> usize {
-    raw_input().len()
+fn get_biggest_scanner_distance(scanner_positions: &[(i16, i16, i16)]) -> usize {
+    let mut biggest_distance = 0;
+    for i in 0..scanner_positions.len() {
+        let a = scanner_positions[i];
+        for j in 1..scanner_positions.len() {
+            let b = scanner_positions[j];
+            let distance = ((a.0 - b.0).abs() + (a.1 - b.1).abs() + (a.2 - b.2).abs()) as usize;
+            if distance > biggest_distance {
+                biggest_distance = distance;
+            }
+        }
+    }
+    biggest_distance
 }
 
-fn calculate_offset(s1: &Scanner, s2: &mut Scanner, common: &[(usize, usize)]) {
-    let (x_mul, x) = (0..3)
+fn get_scanner_position(
+    s1: &Scanner,
+    s2: &Scanner,
+    common: &[(usize, usize)],
+) -> [(usize, i16, i16); 3] {
+    let x = (0..3)
         .find(|i| check_axis(&s1.readings[0], &s2.readings[*i], common))
-        .map(|i| get_diff(&s1.readings[0], &s2.readings[i], common))
+        .map(|i| {
+            let (a, b) = get_diff(&s1.readings[0], &s2.readings[i], common);
+            (i, a, b)
+        })
         .unwrap();
-    let (y_mul, y) = (0..3)
+    let y = (0..3)
         .find(|i| check_axis(&s1.readings[1], &s2.readings[*i], common))
-        .map(|i| get_diff(&s1.readings[1], &s2.readings[i], common))
+        .map(|i| {
+            let (a, b) = get_diff(&s1.readings[1], &s2.readings[i], common);
+            (i, a, b)
+        })
         .unwrap();
-    let (z_mul, z) = (0..3)
+    let z = (0..3)
         .find(|i| check_axis(&s1.readings[2], &s2.readings[*i], common))
-        .map(|i| get_diff(&s1.readings[2], &s2.readings[i], common))
+        .map(|i| {
+            let (a, b) = get_diff(&s1.readings[2], &s2.readings[i], common);
+            (i, a, b)
+        })
         .unwrap();
-    println!("({},{}),({},{}),({},{})", x, x_mul, y, y_mul, z, z_mul);
 
-    for i in 0..s2.readings[0].len() {
-        s2.readings[0][i] -= x;
-        s2.readings[0][i] *= x_mul;
-        s2.readings[1][i] -= y;
-        s2.readings[1][i] *= y_mul;
-        s2.readings[2][i] -= z;
-        s2.readings[2][i] *= z_mul;
+    [x, y, z]
+}
+
+fn offset_scanner(s: &mut Scanner, offsets: [(usize, i16, i16); 3]) {
+    let (mx, x_mul, x) = offsets[0];
+    let (my, y_mul, y) = offsets[1];
+    let (mz, z_mul, z) = offsets[2];
+
+    for i in 0..s.readings[0].len() {
+        let x_tmp = s.readings[mx][i] * x_mul + x;
+        let y_tmp = s.readings[my][i] * y_mul + y;
+        let z_tmp = s.readings[mz][i] * z_mul + z;
+        s.readings[0][i] = x_tmp;
+        s.readings[1][i] = y_tmp;
+        s.readings[2][i] = z_tmp;
     }
 }
 
@@ -85,7 +117,7 @@ fn get_diff(r: &[i16], a: &[i16], m: &[(usize, usize)]) -> (i16, i16) {
         if cmp1 == ref1 && cmp2 == ref2 {
             continue;
         } else if cmp1 == ref1 {
-            return (1, ref1);
+            return (1, ref1 * -1);
         } else {
             return (-1, cmp2);
         }
@@ -138,6 +170,7 @@ fn check_permutations(p1: &[[i16; 3]], p2: &[[i16; 3]]) -> Vec<(usize, usize)> {
         for j in 0..p2.len() {
             if v1.iter().all(|v3| p2[j].contains(v3)) {
                 common.push((i, j));
+                break;
             }
         }
     });
@@ -214,6 +247,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(0, part2());
+        assert_eq!(3621, part2());
     }
 }
