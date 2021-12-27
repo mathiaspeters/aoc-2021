@@ -94,33 +94,17 @@ impl Cuboid {
     }
 
     fn intersecting(&self, other: Cuboid) -> bool {
-        let x_left = other.xr.0 >= self.xr.0 && other.xr.0 <= self.xr.1;
-        let x_right = other.xr.1 >= self.xr.0 && other.xr.1 <= self.xr.1;
-        let x_inside = other.xr.0 <= self.xr.1 && other.xr.1 >= self.xr.1;
-        let y_left = other.yr.0 >= self.yr.0 && other.yr.0 <= self.yr.1;
-        let y_right = other.yr.1 >= self.yr.0 && other.yr.1 <= self.yr.1;
-        let y_inside = other.yr.0 <= self.yr.1 && other.yr.1 >= self.yr.1;
-        let z_left = other.zr.0 >= self.zr.0 && other.zr.0 <= self.zr.1;
-        let z_right = other.zr.1 >= self.zr.0 && other.zr.1 <= self.zr.1;
-        let z_inside = other.zr.0 <= self.zr.1 && other.zr.1 >= self.zr.1;
-        (x_left || x_right || x_inside)
-            && (y_left || y_right || y_inside)
-            && (z_left || z_right || z_inside)
+        let x = other.xr.0 <= self.xr.1 && other.xr.1 >= self.xr.0;
+        let y = other.yr.0 <= self.yr.1 && other.yr.1 >= self.yr.0;
+        let z = other.zr.0 <= self.zr.1 && other.zr.1 >= self.zr.0;
+        x && y && z
     }
 
     fn contained_by(&self, other: Cuboid) -> bool {
-        self.xr.0 >= other.xr.0
-            && self.xr.0 <= other.xr.1
-            && self.xr.1 >= other.xr.0
-            && self.xr.1 <= other.xr.1
-            && self.yr.0 >= other.yr.0
-            && self.yr.0 <= other.yr.1
-            && self.yr.1 >= other.yr.0
-            && self.yr.1 <= other.yr.1
-            && self.zr.0 >= other.zr.0
-            && self.zr.0 <= other.zr.1
-            && self.zr.1 >= other.zr.0
-            && self.zr.1 <= other.zr.1
+        let x = other.xr.0 <= self.xr.0 && other.xr.1 >= self.xr.1;
+        let y = other.yr.0 <= self.yr.0 && other.yr.1 >= self.yr.1;
+        let z = other.zr.0 <= self.zr.0 && other.zr.1 >= self.zr.1;
+        x && y && z
     }
 
     pub fn count_active(&self) -> usize {
@@ -131,37 +115,28 @@ impl Cuboid {
 }
 
 fn limit(input: Vec<(bool, Cuboid)>, min: i32, max: i32) -> Vec<(bool, Cuboid)> {
+    let out_of_bounds = |(a, b): (i32, i32)| -> bool { a > max || b < min };
+    let normalize = |(a, b): (i32, i32)| -> (i32, i32) {
+        let start = std::cmp::max(a, min);
+        let end = std::cmp::min(b, max);
+        (start, end)
+    };
     input
         .into_iter()
-        .filter_map(
-            |(
-                on,
-                Cuboid {
-                    xr: (xs, xe),
-                    yr: (ys, ye),
-                    zr: (zs, ze),
-                },
-            )| {
-                if xs > max || ys > max || zs > max || xe < min || ye < min || ze < min {
-                    None
-                } else {
-                    let xs = if xs < min { min } else { xs };
-                    let xe = if xe > max { max } else { xe };
-                    let ys = if ys < min { min } else { ys };
-                    let ye = if ye > max { max } else { ye };
-                    let zs = if zs < min { min } else { zs };
-                    let ze = if ze > max { max } else { ze };
-                    Some((
-                        on,
-                        Cuboid {
-                            xr: (xs, xe),
-                            yr: (ys, ye),
-                            zr: (zs, ze),
-                        },
-                    ))
-                }
-            },
-        )
+        .filter_map(|(on, Cuboid { xr, yr, zr })| {
+            if out_of_bounds(xr) || out_of_bounds(yr) || out_of_bounds(zr) {
+                None
+            } else {
+                Some((
+                    on,
+                    Cuboid {
+                        xr: normalize(xr),
+                        yr: normalize(yr),
+                        zr: normalize(zr),
+                    },
+                ))
+            }
+        })
         .collect::<Vec<_>>()
 }
 
@@ -173,28 +148,18 @@ fn input() -> Vec<(bool, Cuboid)> {
             let on = parts.next().unwrap() == "on";
             let (xr, yr, zr) = {
                 let coordinates = parts.next().unwrap();
-                let coordinates = coordinates.replace("x", "");
-                let coordinates = coordinates.replace("y", "");
-                let coordinates = coordinates.replace("z", "");
-                let coordinates = coordinates.replace("=", "");
+                let coordinates = coordinates.replace(|c| "xyz=".contains(c), "");
                 let coordinates = coordinates
                     .split(',')
-                    .map(|s| s.split("..").collect::<Vec<_>>())
+                    .map(|s| {
+                        let point = s
+                            .split("..")
+                            .map(|s| s.parse::<i32>().unwrap())
+                            .collect::<Vec<_>>();
+                        (point[0], point[1])
+                    })
                     .collect::<Vec<_>>();
-                (
-                    (
-                        coordinates[0][0].parse().unwrap(),
-                        coordinates[0][1].parse().unwrap(),
-                    ),
-                    (
-                        coordinates[1][0].parse().unwrap(),
-                        coordinates[1][1].parse().unwrap(),
-                    ),
-                    (
-                        coordinates[2][0].parse().unwrap(),
-                        coordinates[2][1].parse().unwrap(),
-                    ),
-                )
+                (coordinates[0], coordinates[1], coordinates[2])
             };
             (on, Cuboid { xr, yr, zr })
         })
